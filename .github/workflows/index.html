@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Hokkaido Team Shifts</title>
+<style>
+  :root {
+    --ink: #1c1a17;
+    --paper: #f4efe6;
+    --card: #fffdf8;
+    --line: #d9d0be;
+    --line-soft: #e8e0d0;
+    --accent: #b5462f;
+    --accent-soft: #f0d9d1;
+    --muted: #8a8272;
+    --sam: #c0392b;
+    --youmin: #1f6f8b;
+    --peta: #8e44ad;
+    --shibu: #d68910;
+    --off: #b06a4f;
+    --event: #6b8e23;
+    --shadow: 0 1px 0 rgba(0,0,0,.03), 0 8px 24px -12px rgba(60,50,30,.28);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Helvetica Neue", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+    padding-bottom: 64px;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 24px 22px 0; }
+
+  /* ---- Header ---- */
+  header.top {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px;
+    border-bottom: 2.5px solid var(--ink);
+    padding-bottom: 14px; margin-bottom: 18px;
+  }
+  .brand h1 { font-family: "Georgia", "Times New Roman", serif; font-size: 30px; letter-spacing: .5px; margin: 0; font-weight: 700; }
+  .today-chip { background: var(--ink); color: var(--paper); font-size: 12.5px; padding: 7px 13px; border-radius: 2px; letter-spacing: .5px; }
+  .today-chip b { color: #f0c9a0; }
+
+  /* ---- Tabs ---- */
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .tab {
+    font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; user-select: none;
+    border: 1px solid var(--line); border-bottom: none; border-radius: 5px 5px 0 0;
+    background: #ece4d5; color: var(--muted); position: relative; top: 1px;
+  }
+  .tab.active { background: var(--card); color: var(--ink); border-color: var(--line); box-shadow: 0 -3px 0 var(--accent) inset; }
+
+  /* ---- Controls ---- */
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .nav-box { display: flex; align-items: center; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; box-shadow: var(--shadow); }
+  .nav-box button { border: none; background: none; font-size: 18px; padding: 7px 13px; cursor: pointer; color: var(--ink); }
+  .nav-box button:hover { background: var(--accent-soft); }
+  .nav-box .label { font-family: "Georgia", serif; font-size: 15.5px; font-weight: 700; min-width: 170px; text-align: center; padding: 0 6px; }
+
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; box-shadow: var(--shadow); }
+  .seg button { border: none; background: var(--card); font-size: 13px; padding: 8px 15px; cursor: pointer; color: var(--muted); }
+  .seg button.active { background: var(--ink); color: var(--paper); font-weight: 600; }
+  .seg button + button { border-left: 1px solid var(--line); }
+
+  .search-box { flex: 1; min-width: 190px; position: relative; }
+  .search-box input {
+    width: 100%; padding: 9px 13px 9px 34px; border: 1px solid var(--line);
+    border-radius: 3px; font-size: 14px; background: var(--card); color: var(--ink); box-shadow: var(--shadow);
+  }
+  .search-box input:focus { outline: none; border-color: var(--accent); }
+  .search-box::before { content: "⌕"; position: absolute; left: 11px; top: 7px; font-size: 17px; color: var(--muted); }
+
+  /* ---- Legend ---- */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 14px; font-size: 12.5px; color: #4a453c; }
+  .legend .lg { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+  .legend .sw.tour { border-left: 4px solid var(--ink); background: #f0ebe0; }
+  .legend .sw.off { background: var(--off); }
+  .legend .sw.event { background: var(--event); }
+
+  /* ---- Staff filter bar ---- */
+  .filterbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+  .staff-filter { display: flex; flex-wrap: wrap; gap: 7px; }
+  .staff-filter .fchip { font-size: 13px; padding: 6px 14px; border-radius: 18px; border: 1.5px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow); }
+  .staff-filter .fchip .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .staff-filter .fchip:hover { border-color: var(--accent); }
+  .staff-filter .fchip.active { color: #fff; border-color: transparent; font-weight: 700; }
+
+  /* ============ OPS GRID (original sheet style) ============ */
+  .ops-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); overflow-x: auto; padding-bottom: 14px; }
+  .ops-grid { display: grid; grid-auto-flow: column; grid-auto-columns: 200px; min-width: max-content; }
+  .ops-col { border-right: 1px solid var(--line-soft); display: flex; flex-direction: column; }
+  .ops-col:last-child { border-right: none; }
+  .ops-col.weekend { background: #faf4e8; }
+  .ops-col.today { background: #fdf3e6; }
+  .ops-dayhead {
+    position: sticky; top: 0; z-index: 2; background: #faf6ee; border-bottom: 2px solid var(--line);
+    padding: 8px 10px; text-align: center;
+  }
+  .ops-col.today .ops-dayhead { background: var(--ink); }
+  .ops-dayhead .dn { font-family: "Georgia", serif; font-size: 17px; font-weight: 700; }
+  .ops-dayhead .wd { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .ops-col.sun .ops-dayhead .dn { color: var(--accent); }
+  .ops-col.today .ops-dayhead .dn, .ops-col.today .ops-dayhead .wd { color: var(--paper); }
+  .ops-body { padding: 7px 7px 10px; display: grid; grid-auto-rows: auto; gap: 7px; flex: 1; align-content: start; }
+  /* dedicated day-off band pinned to the bottom of every day column */
+  .ops-offrow {
+    border-top: 2px dashed var(--line); background: #f3ede0; min-height: 34px;
+    padding: 5px 7px; display: flex; flex-direction: column; gap: 4px; justify-content: center;
+  }
+  .ops-offrow:empty::before { content: "No days off"; font-size: 10px; color: #c3bba9; text-align: center; }
+  .ops-off {
+    font-size: 11px; color: #fff; background: var(--off); border-radius: 4px; padding: 4px 8px;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.16) 0 6px, transparent 6px 12px);
+  }
+  .ops-off b { font-weight: 700; }
+  /* booking card mirrors original 5-row structure */
+  .bk {
+    border: 1px solid var(--line-soft); border-top: 4px solid var(--muted); border-radius: 4px;
+    background: #fffefb; padding: 7px 8px 8px; cursor: pointer; transition: box-shadow .1s, transform .08s;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .bk:hover { box-shadow: 0 4px 12px -4px rgba(0,0,0,.25); transform: translateY(-1px); }
+  .bk.sam { border-top-color: var(--sam); }
+  .bk.youmin { border-top-color: var(--youmin); }
+  .bk.peta { border-top-color: var(--peta); }
+  .bk.other { border-top-color: #7a7264; }
+  .bk.event { border-top-color: var(--event); background: #f6f8ee; }
+  .bk .r1 { font-weight: 700; font-size: 12.5px; line-height: 1.25; }              /* customer/pax */
+  .bk .r-cat { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+  .note-dot { font-size: 10px; }
+  .cat-badge { font-size: 9.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: #5a4a2a; background: #f2e6cc; border: 1px solid #e3d3ad; border-radius: 4px; padding: 1px 6px; }
+  .bk .r2 { font-size: 11px; color: #4a453c; margin-top: 3px; line-height: 1.3; }   /* flight/tour */
+  .bk .r3 { font-size: 11px; color: var(--accent); margin-top: 3px; }               /* vehicle+job */
+  .bk .r4 { font-size: 11px; color: #5a5346; margin-top: 3px; }                     /* driver */
+  .bk .r4 .ic { color: var(--muted); }
+  /* staff name: full-width band at the bottom of the card */
+  .bk .r5 { margin: 6px -8px -8px; margin-top: auto; }
+  .bk .staffbadge { display: block; width: 100%; text-align: center; font-size: 11px; color: #fff; padding: 4px 0; border-radius: 0 0 3px 3px; font-weight: 700; letter-spacing: .5px; }
+  .bk .staffbadge.sam { background: var(--sam); } .bk .staffbadge.youmin { background: var(--youmin); }
+  .bk .staffbadge.peta { background: var(--peta); } .bk .staffbadge.other { background: #7a7264; }
+  .ops-empty { font-size: 10.5px; color: #c3bba9; text-align: center; padding: 14px 0; font-style: italic; }
+
+  /* ============ TIMELINE (gantt) ============ */
+  .tl-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); overflow-x: auto; }
+  .tl-grid { display: grid; min-width: max-content; }
+  /* rows built via JS with inline grid-template-columns */
+  .tl-cell { border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); min-height: 30px; position: relative; }
+  .tl-daynum { font-family: "Georgia", serif; font-size: 12px; font-weight: 700; text-align: center; padding: 6px 0 5px; color: var(--ink); }
+  .tl-daynum .wd { display:block; font-size: 9.5px; color: var(--muted); font-weight: 400; font-family: sans-serif; }
+  .tl-daynum.sun { color: var(--accent); }
+  .tl-daynum.today { background: var(--ink); color: var(--paper); border-radius: 4px; }
+  .tl-daynum.today .wd { color: #f0c9a0; }
+  .tl-corner { background: #faf6ee; border-right: 2px solid var(--line); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 14px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; position: sticky; left: 0; z-index: 3; }
+  .tl-headcell { background: #faf6ee; border-bottom: 2px solid var(--line); border-right: 1px solid var(--line-soft); position: sticky; top: 0; z-index: 1; }
+  .tl-namecell {
+    background: #faf6ee; border-right: 2px solid var(--line); border-bottom: 1px solid var(--line-soft);
+    display: flex; align-items: center; gap: 8px; padding: 0 12px; font-weight: 700; font-size: 14px;
+    position: sticky; left: 0; z-index: 2; min-height: 44px;
+  }
+  .tl-namecell .swatch { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+  .tl-namecell .cnt { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--muted); background: #eee5d5; border-radius: 10px; padding: 1px 8px; }
+  .tl-track { border-bottom: 1px solid var(--line-soft); position: relative; min-height: 44px; }
+  .tl-track .col-sep { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line-soft); }
+  .tl-track.today-col { }
+  .bar {
+    position: absolute; top: 5px; height: 34px; border-radius: 5px; padding: 3px 8px; cursor: pointer;
+    color: #fff; font-size: 11px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.18);
+    display: flex; flex-direction: column; justify-content: center; line-height: 1.15;
+    transition: transform .08s, box-shadow .1s; z-index: 1;
+  }
+  .bar:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,.28); z-index: 4; }
+  .bar b { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar span { opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; }
+  .bar.sam { background: var(--sam); }
+  .bar.youmin { background: var(--youmin); }
+  .bar.peta { background: var(--peta); }
+  .bar.other { background: #7a7264; }
+  .bar.off { background: var(--off); background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 6px, transparent 6px 12px); }
+  .bar.event { background: var(--event); }
+  .tl-empty-row td { color: var(--muted); font-style: italic; padding: 20px; }
+
+  /* ============ CALENDAR ============ */
+  .cal-head { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-bottom: 6px; }
+  .cal-head div { text-align: center; font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 4px 0; }
+  .cal-head div.sun { color: var(--accent); }
+  .calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
+  .cell { background: var(--card); border: 1px solid var(--line-soft); border-radius: 4px; min-height: 128px; padding: 8px 8px 10px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: border-color .1s, transform .08s; position: relative; overflow: hidden; }
+  .cell:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .cell.empty { background: transparent; border: 1px dashed var(--line-soft); cursor: default; }
+  .cell.empty:hover { transform: none; border-color: var(--line-soft); }
+  .cell.today { border: 2px solid var(--ink); }
+  .cell .dnum { font-family: "Georgia", serif; font-size: 17px; font-weight: 700; }
+  .cell.sun .dnum { color: var(--accent); }
+  .cell .dnum .wd { font-size: 10px; color: var(--muted); font-family: sans-serif; font-weight: 400; margin-left: 3px; }
+  .ev { font-size: 11px; padding: 3px 6px; border-radius: 3px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid var(--muted); background: #f6f2ea; }
+  .ev.sam { border-left-color: var(--sam); background: #faece9; }
+  .ev.youmin { border-left-color: var(--youmin); background: #e8f1f4; }
+  .ev.peta { border-left-color: var(--peta); background: #f2eaf6; }
+  .ev.event { border-left-color: var(--event); background: #eef2e2; font-style: italic; }
+  .off-badge { font-size: 9.5px; color: #fff; background: var(--off); border-radius: 3px; padding: 1px 5px; align-self: flex-start; }
+  .more { font-size: 10px; color: var(--muted); padding-left: 4px; }
+  /* day-off band pinned to the bottom of each calendar cell */
+  .cell-off { margin-top: auto; display: flex; flex-direction: column; gap: 3px; padding-top: 4px; }
+  .cell-off .off-row {
+    font-size: 11px; line-height: 1.3; color: #fff; background: var(--off); border-radius: 3px; padding: 3px 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.16) 0 6px, transparent 6px 12px);
+  }
+
+  /* ---- Layout for calendar tab ---- */
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 20px; align-items: start; }
+  .side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 14px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
+  .panel h3 { margin: 0; font-family: "Georgia", serif; font-size: 15px; padding: 11px 15px; border-bottom: 1px solid var(--line-soft); background: #faf6ee; letter-spacing: .3px; }
+  .panel .body { padding: 12px 15px; max-height: 360px; overflow-y: auto; }
+  #dayDetail .empty-note { color: var(--muted); font-size: 13px; font-style: italic; }
+  .job-card { border-left: 3px solid var(--muted); padding: 8px 10px; margin-bottom: 10px; background: #faf7f1; border-radius: 0 4px 4px 0; }
+  .job-card.sam { border-left-color: var(--sam); }
+  .job-card.youmin { border-left-color: var(--youmin); }
+  .job-card.peta { border-left-color: var(--peta); }
+  .job-card.event { border-left-color: var(--event); }
+  .job-card .cust { font-weight: 700; font-size: 13.5px; }
+  .job-card .meta { font-size: 12px; color: #4a453c; margin-top: 3px; }
+  .job-card .meta .k { color: var(--muted); }
+  .job-card .staffbadge { display: inline-block; font-size: 10.5px; color: #fff; padding: 1px 7px; border-radius: 10px; margin-top: 5px; }
+  .job-card .staffbadge.sam { background: var(--sam); }
+  .job-card .staffbadge.youmin { background: var(--youmin); }
+  .job-card .staffbadge.peta { background: var(--peta); }
+  .drv-search { width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 3px; font-size: 13px; margin-bottom: 8px; background: #fff; }
+  .drv-search:focus { outline: none; border-color: var(--accent); }
+  .drv-group { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin: 8px 0 4px; }
+  .drv { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dotted var(--line-soft); font-size: 12.5px; gap: 8px; }
+  .drv .nm { font-weight: 600; }
+  .drv a { color: var(--youmin); text-decoration: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .drv a:hover { text-decoration: underline; }
+
+  /* ---- Popover for bar detail ---- */
+  #pop { position: fixed; z-index: 50; max-width: 320px; background: var(--card); border: 1px solid var(--ink); border-radius: 6px; box-shadow: 0 10px 30px -8px rgba(0,0,0,.4); padding: 12px 14px; display: none; }
+  #pop .cust { font-weight: 700; font-size: 14px; margin-bottom: 5px; }
+  #pop .meta { font-size: 12.5px; color: #4a453c; margin-top: 4px; }
+  #pop .meta .k { color: var(--muted); }
+  #pop .staffbadge { display: inline-block; font-size: 11px; color: #fff; padding: 2px 9px; border-radius: 10px; margin-top: 8px; }
+  #pop .staffbadge.sam { background: var(--sam); } #pop .staffbadge.youmin { background: var(--youmin); } #pop .staffbadge.peta { background: var(--peta); }
+  #pop .close { position: absolute; top: 7px; right: 10px; cursor: pointer; color: var(--muted); font-size: 15px; }
+
+  .foot { text-align: center; font-size: 11px; color: var(--muted); margin: 24px 0 8px; letter-spacing: .5px; }
+  .hidden { display: none !important; }
+
+  /* ---- Toolbar buttons ---- */
+  .tool-btns { display: flex; gap: 6px; align-items: center; }
+  .sync-status { font-size: 12px; font-weight: 600; color: #8a8272; margin-left: 4px; white-space: nowrap; }
+  .btn { border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 13px; padding: 8px 13px; border-radius: 4px; cursor: pointer; box-shadow: var(--shadow); font-weight: 600; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.ghost { color: var(--muted); font-weight: 500; }
+  .btn.danger { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.danger:hover { filter: brightness(1.05); }
+
+  /* ---- Add / mini action buttons ---- */
+  .add-btn { border: none; background: var(--accent-soft); color: var(--accent); font-size: 14px; line-height: 1; width: 20px; height: 20px; border-radius: 4px; cursor: pointer; margin-left: 6px; font-weight: 700; }
+  .add-btn:hover { background: var(--accent); color: #fff; }
+  .ops-col.today .add-btn { background: rgba(255,255,255,.25); color: #fff; }
+  .add-btn.inline { width: auto; padding: 2px 9px; font-size: 12px; }
+  .bk { position: relative; }
+  .bk-actions { position: absolute; top: 4px; right: 4px; display: none; gap: 3px; }
+  .bk:hover .bk-actions { display: flex; }
+  .mini { border: 1px solid var(--line); background: #fff; border-radius: 4px; font-size: 11px; line-height: 1; padding: 2px 5px; cursor: pointer; color: var(--ink); }
+  .mini:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .mini.del:hover { background: #f8d7d0; border-color: var(--accent); }
+  .card-actions { float: right; display: inline-flex; gap: 3px; }
+  .ops-off { position: relative; }
+  .mini.offdel { position: absolute; top: 3px; right: 3px; padding: 0 4px; background: rgba(255,255,255,.85); }
+
+  /* ---- Modal ---- */
+  #modalOverlay, #staffOverlay, #detailOverlay, #driversOverlay, #confirmOverlay { position: fixed; inset: 0; background: rgba(28,26,23,.42); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  #modalOverlay.hidden, #staffOverlay.hidden, #detailOverlay.hidden, #driversOverlay.hidden, #confirmOverlay.hidden { display: none !important; }
+  #confirmOverlay { z-index: 200; }
+  .confirm-modal { max-width: 380px; }
+  .confirm-body { padding: 22px 22px 4px; font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .modal { background: var(--card); border-radius: 8px; width: 100%; max-width: 440px; box-shadow: 0 20px 50px -10px rgba(0,0,0,.4); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line-soft); font-family: "Georgia", serif; font-size: 17px; font-weight: 700; background: #faf6ee; }
+  .modal-x { border: none; background: none; font-size: 17px; cursor: pointer; color: var(--muted); }
+  .modal-body { padding: 16px 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .modal-body label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: #4a453c; }
+  .modal-body label.chk { flex-direction: row; align-items: center; gap: 7px; font-weight: 500; }
+  .modal-body input[type=text], .modal-body select, .modal-body textarea { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; background: #fff; color: var(--ink); font-weight: 400; }
+  .modal-body textarea { font-family: inherit; resize: vertical; line-height: 1.4; }
+  .modal-body input:focus, .modal-body select:focus, .modal-body textarea:focus { outline: none; border-color: var(--accent); }
+  .modal-body input:focus, .modal-body select:focus { outline: none; border-color: var(--accent); }
+  .date-row { display: flex; gap: 8px; }
+  .date-row select { flex: 1; }
+  .req { color: var(--accent); }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 13px 18px; border-top: 1px solid var(--line-soft); background: #faf9f4; }
+  #jobFields, #offFields { display: flex; flex-direction: column; gap: 12px; }
+  .modeseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; margin-bottom: 4px; }
+  .modeseg button { border: none; background: #fff; padding: 7px 14px; font-size: 13px; cursor: pointer; color: var(--muted); }
+  .modeseg button.active { background: var(--ink); color: #fff; font-weight: 600; }
+  .modeseg button + button { border-left: 1px solid var(--line); }
+
+  /* ---- Category field in modal ---- */
+  .cat-field { display: flex; flex-direction: column; gap: 8px; }
+  .cat-label { font-size: 12.5px; font-weight: 600; color: #4a453c; }
+  #fCatSelect { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; background: #fff; color: var(--ink); }
+  #fCatSelect:focus { outline: none; border-color: var(--accent); }
+  .cat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-tags:empty { display: none; }
+  .cat-tag { font-size: 12.5px; font-weight: 600; padding: 5px 8px 5px 11px; border-radius: 16px; background: var(--accent); color: #fff; display: inline-flex; align-items: center; gap: 6px; }
+  .cat-tag .x { cursor: pointer; font-size: 13px; opacity: .8; line-height: 1; }
+  .cat-tag .x:hover { opacity: 1; }
+  .cat-add { display: flex; gap: 6px; }
+  .cat-add input { flex: 1; padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px; }
+  .cat-add .btn { padding: 8px 14px; }
+
+  /* ---- Staff manager ---- */
+  #staffList { display: flex; flex-direction: column; gap: 8px; }
+  .staff-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: 6px; background: #fffefb; }
+  .staff-row .swrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .staff-row input[type=color] { width: 30px; height: 26px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; background: none; }
+  .staff-row .sname { font-weight: 700; font-size: 14px; }
+  .staff-row .used { font-size: 11px; color: var(--muted); }
+  .staff-email { flex: 1; min-width: 120px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 5px; font-size: 12.5px; }
+  .staff-email:focus { outline: none; border-color: var(--accent); }
+  .staff-add-row input[type=email] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; }
+  .staff-row .rm { border: 1px solid var(--line); background: #fff; border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer; color: var(--accent); }
+  .staff-row .rm:disabled { color: #c3bba9; cursor: not-allowed; border-color: var(--line-soft); }
+  .staff-row .rm:not(:disabled):hover { background: #f8d7d0; border-color: var(--accent); }
+  .staff-add-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .staff-add-row input[type=text] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; }
+  .staff-add-row input[type=color] { width: 40px; height: 38px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; }
+  .staff-note { font-size: 11.5px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
+
+  /* ---- Detail modal ---- */
+  #detailBody .d-cust { font-family: "Georgia", serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  #detailBody .d-band { height: 5px; border-radius: 3px; margin-bottom: 14px; }
+  #detailBody .d-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
+  #detailBody .d-row:last-child { border-bottom: none; }
+  #detailBody .d-row .d-k { flex: none; width: 92px; color: var(--muted); font-size: 12.5px; font-weight: 600; padding-top: 1px; }
+  #detailBody .d-row .d-v { flex: 1; color: var(--ink); }
+  #detailBody .d-staff { display: inline-block; color: #fff; font-weight: 700; padding: 3px 12px; border-radius: 12px; font-size: 13px; }
+  #detailBody .d-notes { white-space: pre-wrap; line-height: 1.5; color: #4a453c; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .side { position: static; }
+  }
+  @media print {
+    body { padding-bottom: 0; }
+    .controls, .tabs, .side, .foot, .search-box { display: none; }
+    .tl-wrap { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Travel Hokkaido Team Shifts</h1></div>
+    <div class="today-chip">TODAY · <b id="todayStr"></b></div>
+  </header>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="nav-box">
+      <button id="prevBtn" title="Previous">‹</button>
+      <div class="label" id="rangeLabel"></div>
+      <button id="nextBtn" title="Next">›</button>
+    </div>
+    <div class="seg" id="rangeSeg">
+      <button data-range="week" class="active">Job Sheet</button>
+      <button data-range="month">Calendar</button>
+    </div>
+    <div class="search-box">
+      <input id="search" type="text" placeholder="Search customer · tour · vehicle · driver (all months)…" autocomplete="off">
+    </div>
+    <div class="tool-btns">
+      <button class="btn primary" id="topAdd" title="Add to this month">＋ Add</button>
+      <button class="btn ghost" id="btnDrivers" title="Driver contacts">🚗 Drivers</button>
+      <button class="btn ghost" id="btnStaff" title="Manage staff">👥 Staff</button>
+      <button class="btn ghost" id="btnExport" title="Export JSON backup">⬇ Backup</button>
+      <span id="syncStatus" class="sync-status">● Local only</span>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <span class="filter-label">Filter by staff</span>
+    <div class="staff-filter" id="staffFilter"></div>
+  </div>
+
+  <!-- OPS WEEK VIEW (original sheet card style) -->
+  <div id="opsView">
+    <div class="ops-wrap"><div class="ops-grid" id="opsGrid"></div></div>
+  </div>
+
+  <!-- OPS MONTH VIEW (calendar grid) -->
+  <div id="calendarView" class="hidden">
+    <div class="layout">
+      <div>
+        <div class="cal-head"><div class="sun">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+        <div class="calendar" id="calendar"></div>
+      </div>
+      <aside class="side">
+        <div class="panel">
+          <h3 id="dayTitle">Select a date</h3>
+          <div class="body" id="dayDetail"><div class="empty-note">Click a date to see that day's schedule.</div></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="foot" id="searchResultsFoot"></div>
+</div>
+
+<!-- Detail modal (shown on card/bar click) -->
+<div id="detailOverlay" class="hidden">
+  <div class="modal">
+    <div class="modal-head"><span id="detailTitle">Details</span><button class="modal-x" id="detailX">✕</button></div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-foot" id="detailFoot"></div>
+  </div>
+</div>
+
+<!-- Add/Edit modal -->
+<div id="modalOverlay" class="hidden">
+  <div class="modal">
+    <div class="modal-head"><span id="modalTitle">Add Entry</span><button class="modal-x" id="modalCancel">✕</button></div>
+    <div class="modal-body">
+      <div class="modeseg" id="modeSeg">
+        <button data-mode="job" class="active">📋 Job</button>
+        <button data-mode="off">🏖 Day Off</button>
+      </div>
+      <label>Date
+        <div class="date-row">
+          <select id="fMonth"></select>
+          <select id="fDay"></select>
+        </div>
+      </label>
+      <div id="jobFields">
+        <label>Customer / Group <span class="req">*</span><input id="fCustomer" type="text" placeholder="e.g. Yum and group 5名"></label>
+        <label>Flight / Tour info<input id="fInfo" type="text" placeholder="e.g. CTS (TG670 8:20) - Toya"></label>
+        <label>Vehicle<input id="fVehicle" type="text" placeholder="e.g. micro"></label>
+        <label>Driver<input id="fDriver" type="text" placeholder="e.g. kimura san / 加藤 901"></label>
+        <div class="cat-field">
+          <span class="cat-label">Job</span>
+          <select id="fCatSelect"></select>
+          <div class="cat-add hidden" id="fCatCustomRow">
+            <input id="fCatNew" type="text" placeholder="Type a new job…">
+            <button type="button" class="btn primary" id="fCatAdd">Add</button>
+          </div>
+          <div id="fCatTags" class="cat-tags"></div>
+        </div>
+        <label>Staff
+          <select id="fStaff">
+            <option value="">— None —</option>
+            <option value="sam">sam</option>
+            <option value="youmin">youmin</option>
+            <option value="peta">peta</option>
+          </select>
+        </label>
+        <label class="chk"><input id="fEvent" type="checkbox"> Mark as team event (everyone)</label>
+        <label>Notes<textarea id="fNotes" rows="3" placeholder="Free notes, reminders, special requests…"></textarea></label>
+      </div>
+      <div id="offFields" class="hidden">
+        <label>Person off <span class="req">*</span>
+          <select id="fOffPerson">
+            <option value="sam">sam</option>
+            <option value="youmin">youmin</option>
+            <option value="peta">peta</option>
+            <option value="shibu">shibu</option>
+            <option value="michio">michio</option>
+          </select>
+        </label>
+        <label>Note<input id="fOffNote" type="text" placeholder="e.g. Korea / california / off"></label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="modalCancel2">Cancel</button>
+      <button class="btn primary" id="modalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Driver contacts modal -->
+<div id="driversOverlay" class="hidden">
+  <div class="modal">
+    <div class="modal-head"><span>🚗 Driver Contacts</span><button class="modal-x" id="driversX">✕</button></div>
+    <div class="modal-body">
+      <input class="drv-search" id="drvSearch" type="text" placeholder="Search driver name / group…" autocomplete="off">
+      <div id="drvList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn primary" id="driversDone">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Staff manager modal -->
+<div id="staffOverlay" class="hidden">
+  <div class="modal">
+    <div class="modal-head"><span>👥 Manage Staff</span><button class="modal-x" id="staffX">✕</button></div>
+    <div class="modal-body">
+      <div id="staffList"></div>
+      <div class="staff-add-row">
+        <input id="newStaffName" type="text" placeholder="New staff name (e.g. mina)">
+        <input id="newStaffEmail" type="email" placeholder="google email (optional)">
+        <input id="newStaffColor" type="color" value="#16a085" title="Color">
+        <button class="btn primary" id="newStaffAdd">＋ Add</button>
+      </div>
+      <p class="staff-note">Add each staff member's Google email to auto-add their jobs to their Google Calendar (they get an invite). Calendar sync must be configured in config.js. Staff with assigned entries can't be deleted.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn primary" id="staffDone">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom confirm / alert -->
+<div id="confirmOverlay" class="hidden">
+  <div class="modal confirm-modal">
+    <div class="confirm-body" id="confirmMsg"></div>
+    <div class="modal-foot" id="confirmFoot"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const _now = new Date();
+  const TODAY = { m: _now.getMonth() + 1, d: _now.getDate(), y: _now.getFullYear() };
+
+  // ---------------- Persistence (Firebase Firestore shared doc + localStorage fallback) ----------------
+  const STORE_KEY = "thk_shifts_v1";
+  const DOC_PATH = { col: "dashboards", id: "main" };  // single shared document
+  let JOBS, STAFF_OFF, STAFF, CATEGORIES;
+  const STAFF_SEED = [
+    { key:"sam", name:"sam", color:"#c0392b" },
+    { key:"youmin", name:"youmin", color:"#1f6f8b" },
+    { key:"peta", name:"peta", color:"#8e44ad" },
+  ];
+  const CATEGORIES_SEED = ["Guide", "Airport meeting", "Attendant"];
+  const STAFF_PALETTE = ["#c0392b","#1f6f8b","#8e44ad","#d68910","#16a085","#2c3e70","#a04000","#7d3c98","#117864","#b03a5b"];
+  let _idSeq = 1;
+  const newId = () => "id" + (_idSeq++) + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  function ensureIds(arr) { arr.forEach(x => { if (!x.id) x.id = newId(); }); return arr; }
+
+  // Firestore init (only if config.js provides firebaseConfig)
+  let fbDoc = null, fbReady = false, saveTimer = null, applyingRemote = false;
+  try {
+    if (window.firebaseConfig && window.firebaseConfig.projectId && window.firebase) {
+      firebase.initializeApp(window.firebaseConfig);
+      fbDoc = firebase.firestore().collection(DOC_PATH.col).doc(DOC_PATH.id);
+    }
+  } catch(e) { console.warn("Firebase init failed", e); }
+
+  function seedDefaults() {
+    JOBS = JOBS_SEED.map(j => ({...j}));
+    STAFF_OFF = STAFF_OFF_SEED.map(o => ({...o}));
+    STAFF = STAFF_SEED.map(s => ({...s}));
+    CATEGORIES = CATEGORIES_SEED.slice();
+    ensureIds(JOBS); ensureIds(STAFF_OFF);
+  }
+  function applyDoc(data) {
+    JOBS = Array.isArray(data.jobs) ? data.jobs : [];
+    STAFF_OFF = Array.isArray(data.off) ? data.off : [];
+    STAFF = Array.isArray(data.staff) && data.staff.length ? data.staff : STAFF_SEED.map(s=>({...s}));
+    CATEGORIES = Array.isArray(data.categories) && data.categories.length ? data.categories : CATEGORIES_SEED.slice();
+    ensureIds(JOBS); ensureIds(STAFF_OFF);
+  }
+  function currentDoc() { return { jobs: JOBS, off: STAFF_OFF, staff: STAFF, categories: CATEGORIES }; }
+
+  async function loadData() {
+    if (fbDoc) {
+      try {
+        const snap = await fbDoc.get();
+        if (snap.exists && snap.data() && snap.data().data) { applyDoc(snap.data().data); fbReady = true; return; }
+        seedDefaults();
+        await fbDoc.set({ data: currentDoc(), updated_at: Date.now() });
+        fbReady = true;
+        return;
+      } catch(e) { console.warn("Firestore load failed, using local fallback", e); }
+    }
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) { applyDoc(JSON.parse(raw)); return; }
+    } catch(e) {}
+    seedDefaults();
+  }
+
+  function saveData() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(currentDoc())); } catch(e) {}
+    pushCalendarSync();
+    if (applyingRemote || !fbDoc || !fbReady) return;
+    clearTimeout(saveTimer);
+    const snapshot = JSON.parse(JSON.stringify(currentDoc()));
+    saveTimer = setTimeout(async () => {
+      try {
+        setSyncStatus("saving");
+        await fbDoc.set({ data: snapshot, updated_at: Date.now() });
+        setSyncStatus("saved");
+      } catch(e) { setSyncStatus("error"); }
+    }, 400);
+  }
+
+  // ---- Google Calendar auto-sync (via Apps Script web app) ----
+  let gcalTimer = null;
+  function pushCalendarSync() {
+    if (applyingRemote) return;
+    if (!window.GCAL_SYNC_URL) return;
+    clearTimeout(gcalTimer);
+    const payload = { secret: window.GCAL_SYNC_SECRET || "", jobs: JOBS, staff: STAFF };
+    gcalTimer = setTimeout(() => {
+      try {
+        fetch(window.GCAL_SYNC_URL, {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        }).catch(()=>{});
+      } catch(e) {}
+    }, 800);
+  }
+
+  function subscribeRealtime() {
+    if (!fbDoc || !fbReady) return;
+    fbDoc.onSnapshot(snap => {
+      if (!snap.exists) return;
+      const d = snap.data();
+      if (!d || !d.data) return;
+      if (snap.metadata.hasPendingWrites) return; // ignore our own local writes
+      applyingRemote = true;
+      applyDoc(d.data);
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(currentDoc())); } catch(e) {}
+      renderCurrent();
+      applyingRemote = false;
+      setSyncStatus("saved");
+    }, err => { console.warn("onSnapshot error", err); setSyncStatus("error"); });
+  }
+
+  function setSyncStatus(state) {
+    const el = $("syncStatus"); if (!el) return;
+    const map = {
+      saving: { t: "Saving…", c: "#d68910" },
+      saved:  { t: "Synced",  c: "#117864" },
+      error:  { t: "Offline (local only)", c: "#b03a5b" },
+      local:  { t: "Local only", c: "#8a8272" },
+    };
+    const s = map[state] || map.local;
+    el.textContent = "● " + s.t; el.style.color = s.c;
+  }
+
+  function jobById(id) { return JOBS.find(j => j.id === id); }
+  function offById(id) { return STAFF_OFF.find(o => o.id === id); }
+  function staffOf(name) {
+    const s = (name || "").toLowerCase();
+    if (!s) return null;
+    return STAFF.find(st => s.includes(st.key.toLowerCase()) || s.includes(st.name.toLowerCase())) || null;
+  }
+  function staffColor(name) { const st = staffOf(name); return st ? st.color : "#7a7264"; }
+  function exportData() {
+    const blob = new Blob([JSON.stringify(currentDoc(), null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "travel-hokkaido-shifts.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  let view = "ops";             // 'ops' | 'timeline'
+  let range = "week";           // 'week' (ops cards) | 'month' (calendar)
+  let curMonth = 7;
+  let weekStart = { m: 7, d: 1 }; // start day of the currently shown week (month-relative)
+  let selectedDay = null;
+  let searchTerm = "";
+
+  const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  // ---- Custom confirm / alert (Promise-based) ----
+  function uiConfirm(message, { okText="Delete", cancelText="Cancel", danger=true } = {}) {
+    return new Promise(resolve => {
+      $("confirmMsg").textContent = message;
+      $("confirmFoot").innerHTML =
+        `<button class="btn ghost" id="cfCancel">${escapeHtml(cancelText)}</button>` +
+        `<button class="btn ${danger?'danger':'primary'}" id="cfOk">${escapeHtml(okText)}</button>`;
+      $("confirmOverlay").classList.remove("hidden");
+      const done = (v) => { $("confirmOverlay").classList.add("hidden"); resolve(v); };
+      $("cfOk").onclick = () => done(true);
+      $("cfCancel").onclick = () => done(false);
+      $("confirmOverlay").onclick = (e) => { if (e.target.id==="confirmOverlay") done(false); };
+      setTimeout(()=>$("cfOk").focus(), 30);
+    });
+  }
+  function uiAlert(message, { okText="OK" } = {}) {
+    return new Promise(resolve => {
+      $("confirmMsg").textContent = message;
+      $("confirmFoot").innerHTML = `<button class="btn primary" id="cfOk">${escapeHtml(okText)}</button>`;
+      $("confirmOverlay").classList.remove("hidden");
+      const done = () => { $("confirmOverlay").classList.add("hidden"); resolve(); };
+      $("cfOk").onclick = done;
+      $("confirmOverlay").onclick = (e) => { if (e.target.id==="confirmOverlay") done(); };
+      setTimeout(()=>$("cfOk").focus(), 30);
+    });
+  }
+
+  // returns the matched staff key (for grouping) or null
+  function staffKey(name) { const st = staffOf(name); return st ? st.key : null; }
+  function primaryStaff(j) { return staffKey(j.staff); }
+  const jobsFor = (m,d) => JOBS.filter(j => j.m===m && j.d===d && j.customer);
+  const offFor = (m,d) => STAFF_OFF.filter(o => o.m===m && o.d===d);
+  const weekdayOf = (m,d) => (FIRST_WEEKDAY_2026[m] + d - 1) % 7;
+
+  $("todayStr").textContent =
+    `${TODAY.y}.${String(TODAY.m).padStart(2,"0")}.${String(TODAY.d).padStart(2,"0")} (${WD[_now.getDay()]})`;
+
+  // ---------------- OPS GRID (original sheet layout) ----------------
+  function renderOps() {
+    // always show the full current month as horizontally-scrolling day columns
+    const n = DAYS_IN_MONTH_2026[curMonth];
+    const days = Array.from({length:n}, (_,i) => ({ m: curMonth, d: i+1 }));
+    const grid = $("opsGrid");
+    const wrap = grid.parentElement; // .ops-wrap (scroll container)
+    const prevScroll = wrap ? wrap.scrollLeft : 0;
+
+    const staffRank = new Map(STAFF.map((s,i) => [s.key, i]));
+    const rankOf = (j) => {
+      if (j.tag === "event") return -1;
+      const k = staffKey(j.staff);
+      return k != null && staffRank.has(k) ? staffRank.get(k) : 999;
+    };
+
+    // ---- Pass 1: assign a row to each job WITHOUT fixed lanes.
+    // A staff's job reuses the row their job used yesterday (so consecutive-day
+    // streaks line up side by side); otherwise it takes the first free row.
+    // No empty rows are reserved — days pack from the top.
+    const rowMap = {};            // jobId -> row index (0-based)
+    let prevRowByStaff = {};      // staffKey -> row used the previous day
+    let maxRow = 0;
+    days.forEach(({m,d}) => {
+      let dj = jobsFor(m,d).filter(filterMatchJob);
+      dj = dj.slice().sort((a,b) => rankOf(a)-rankOf(b));
+      const used = new Set();
+      const curRowByStaff = {};
+      // 1) staff continuing from yesterday keep the same row (if still free)
+      dj.forEach(j => {
+        const k = staffKey(j.staff);
+        if (k != null && prevRowByStaff[k] != null && !used.has(prevRowByStaff[k])) {
+          const r = prevRowByStaff[k];
+          rowMap[j.id] = r; used.add(r); curRowByStaff[k] = r;
+        }
+      });
+      // 2) everyone else takes the lowest free row
+      dj.forEach(j => {
+        if (rowMap[j.id] != null) return;
+        let r = 0; while (used.has(r)) r++;
+        rowMap[j.id] = r; used.add(r);
+        const k = staffKey(j.staff);
+        if (k != null) curRowByStaff[k] = r;
+      });
+      dj.forEach(j => { if (rowMap[j.id] > maxRow) maxRow = rowMap[j.id]; });
+      prevRowByStaff = curRowByStaff;
+    });
+
+    let html = "";
+    days.forEach(({m,d}) => {
+      const wd = weekdayOf(m,d);
+      const isToday = (m===TODAY.m && d===TODAY.d);
+      const weekend = (wd===0 || wd===6);
+      let col = `<div class="ops-col ${wd===0?'sun':''} ${weekend?'weekend':''} ${isToday?'today':''}">`;
+      col += `<div class="ops-dayhead"><span class="dn">${d}</span><span class="wd">${WD[wd]}</span><button class="add-btn" data-add="${m}-${d}" title="Add entry">＋</button></div>`;
+      col += `<div class="ops-body" style="grid-template-rows: repeat(${maxRow+1}, minmax(92px, auto))">`;
+      let dj = jobsFor(m,d).filter(filterMatchJob);
+      dj = dj.map((j,i) => ({j,i})).sort((a,b) => (rankOf(a.j)-rankOf(b.j)) || (a.i-b.i)).map(x => x.j);
+      if (!dj.length) col += `<div class="ops-empty" style="grid-row:1">—</div>`;
+      dj.forEach(j => {
+        const isEvent = j.tag==="event";
+        const col2 = isEvent ? "var(--event)" : staffColor(j.staff);
+        const row = (rowMap[j.id] ?? 0) + 1;
+        col += `<div class="bk" data-job="${j.id}" style="border-top-color:${col2};grid-row:${row}">
+          <div class="bk-actions">
+            <button class="mini edit" data-edit="${j.id}" title="Edit">✎</button>
+            <button class="mini del" data-del="${j.id}" title="Delete">🗑</button>
+          </div>
+          <div class="r1">${escapeHtml(j.customer)}${j.notes?` <span class="note-dot" title="Has notes">📝</span>`:""}</div>
+          ${(j.categories&&j.categories.length)?`<div class="r-cat">${j.categories.map(c=>`<span class="cat-badge">${escapeHtml(c)}</span>`).join("")}</div>`:""}
+          ${j.info?`<div class="r2">${escapeHtml(j.info)}</div>`:""}
+          ${j.vehicle?`<div class="r3">🚐 ${escapeHtml(j.vehicle)}</div>`:""}
+          ${j.driver?`<div class="r4"><span class="ic">👤</span> ${escapeHtml(j.driver)}</div>`:""}
+          ${j.staff?`<div class="r5"><span class="staffbadge" style="background:${col2}">${escapeHtml(j.staff)}</span></div>`:""}
+        </div>`;
+      });
+      col += `</div>`; // end ops-body
+      // dedicated day-off slot at the bottom of every column
+      const offs = offFor(m,d).filter(filterMatchOff);
+      col += `<div class="ops-offrow">`;
+      offs.forEach(o => { col += `<div class="ops-off" data-offedit="${o.id}"><b>🏖 ${escapeHtml(o.person)}</b> ${escapeHtml(o.note||"Off")}<button class="mini del offdel" data-offdel="${o.id}" title="Delete">✕</button></div>`; });
+      col += `</div>`;
+      col += `</div>`; // end ops-col
+      html += col;
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll(".bk[data-job]").forEach(el => el.addEventListener("click", e => {
+      if (e.target.closest("[data-edit]") || e.target.closest("[data-del]")) return;
+      showPop(e, jobById(el.dataset.job));
+    }));
+    grid.querySelectorAll("[data-edit]").forEach(el => el.addEventListener("click", e => { e.stopPropagation(); openJobModal(jobById(el.dataset.edit)); }));
+    grid.querySelectorAll("[data-del]").forEach(el => el.addEventListener("click", e => { e.stopPropagation(); deleteJob(el.dataset.del); }));
+    grid.querySelectorAll("[data-add]").forEach(el => el.addEventListener("click", e => { e.stopPropagation(); const [m,d]=el.dataset.add.split("-").map(Number); openJobModal(null, m, d); }));
+    grid.querySelectorAll("[data-offdel]").forEach(el => el.addEventListener("click", e => { e.stopPropagation(); deleteOff(el.dataset.offdel); }));
+    // Center today on first view of a month; keep scroll position on in-place re-renders (e.g. after save).
+    if (opsLastMonth !== curMonth) {
+      opsLastMonth = curMonth;
+      const todayCol = grid.querySelector(".ops-col.today");
+      if (todayCol) todayCol.scrollIntoView({ inline: "center", block: "nearest" });
+      else if (wrap) wrap.scrollLeft = 0;
+    } else if (wrap) {
+      wrap.scrollLeft = prevScroll;
+    }
+  }
+  let opsLastMonth = null;
+
+
+  // Build list of days for current range
+  function rangeDays() {
+    if (range === "month") {
+      const n = DAYS_IN_MONTH_2026[curMonth];
+      return Array.from({length:n}, (_,i) => ({ m: curMonth, d: i+1 }));
+    } else {
+      // week: 7 days starting weekStart (clamped within month)
+      const days = [];
+      const n = DAYS_IN_MONTH_2026[weekStart.m];
+      for (let i=0;i<7;i++){ const d = weekStart.d + i; if (d>=1 && d<=n) days.push({ m: weekStart.m, d }); }
+      return days;
+    }
+  }
+
+  function rangeLabelText() {
+    return MONTH_NAMES[curMonth] + " 2026";
+  }
+
+  // ---------------- Detail modal (on card/bar click) ----------------
+  function showPop(e, j) {
+    if (!j) return;
+    const col = j.tag==="event" ? "var(--event)" : staffColor(j.staff);
+    $("detailTitle").textContent = j.tag==="event" ? "Team Event" : "Job Details";
+    $("detailBody").innerHTML = `
+      <div class="d-cust">${escapeHtml(j.customer)}</div>
+      <div class="d-band" style="background:${col}"></div>
+      <div class="d-row"><span class="d-k">📅 Date</span><span class="d-v">${MONTH_NAMES[j.m]} ${j.d}, 2026</span></div>
+      ${(j.categories&&j.categories.length)?`<div class="d-row"><span class="d-k">🏷 Job</span><span class="d-v">${j.categories.map(c=>`<span class="cat-badge">${escapeHtml(c)}</span>`).join(" ")}</span></div>`:""}
+      ${j.info ? `<div class="d-row"><span class="d-k">📋 Info</span><span class="d-v">${escapeHtml(j.info)}</span></div>`:""}
+      ${j.vehicle ? `<div class="d-row"><span class="d-k">🚐 Vehicle</span><span class="d-v">${escapeHtml(j.vehicle)}</span></div>`:""}
+      ${j.driver ? `<div class="d-row"><span class="d-k">👤 Driver</span><span class="d-v">${escapeHtml(j.driver)}</span></div>`:""}
+      ${j.staff ? `<div class="d-row"><span class="d-k">🧑‍💼 Staff</span><span class="d-v"><span class="d-staff" style="background:${col}">${escapeHtml(j.staff)}</span></span></div>`:""}
+      ${j.notes ? `<div class="d-row"><span class="d-k">📝 Notes</span><span class="d-v d-notes">${escapeHtml(j.notes).replace(/\n/g,"<br>")}</span></div>`:""}`;
+    $("detailFoot").innerHTML = `
+      <button class="btn ghost" id="detailDelete">🗑 Delete</button>
+      <button class="btn primary" id="detailEdit">✎ Edit</button>`;
+    $("detailEdit").onclick = () => { closeDetail(); openJobModal(j); };
+    $("detailDelete").onclick = () => { closeDetail(); deleteJob(j.id); };
+    $("detailOverlay").classList.remove("hidden");
+  }
+  function showPopOff(e, note) {
+    $("detailTitle").textContent = "Day Off";
+    $("detailBody").innerHTML = `
+      <div class="d-cust">🏖 Day off</div>
+      <div class="d-band" style="background:var(--off)"></div>
+      ${note ? `<div class="d-row"><span class="d-k">📝 Note</span><span class="d-v">${escapeHtml(note)}</span></div>` : `<div class="d-row"><span class="d-v" style="color:var(--muted)">No note</span></div>`}`;
+    $("detailFoot").innerHTML = "";
+    $("detailOverlay").classList.remove("hidden");
+  }
+  function closeDetail() { $("detailOverlay").classList.add("hidden"); }
+  $("detailX").addEventListener("click", closeDetail);
+  $("detailOverlay").addEventListener("click", e => { if (e.target.id==="detailOverlay") closeDetail(); });
+
+  // ---------------- CALENDAR ----------------
+  function renderCalendar() {
+    const firstWd = FIRST_WEEKDAY_2026[curMonth];
+    const days = DAYS_IN_MONTH_2026[curMonth];
+    const cal = $("calendar");
+    cal.innerHTML = "";
+    for (let i=0;i<firstWd;i++){ const e=document.createElement("div"); e.className="cell empty"; cal.appendChild(e); }
+    for (let d=1; d<=days; d++){
+      const wd = (firstWd+d-1)%7;
+      const cell = document.createElement("div");
+      cell.className = "cell" + (wd===0?" sun":"");
+      if (curMonth===TODAY.m && d===TODAY.d) cell.classList.add("today");
+      let html = `<div class="dnum">${d}<span class="wd">${WD[wd]}</span></div>`;
+      const dj = jobsFor(curMonth,d).filter(filterMatchJob);
+      dj.slice(0,4).forEach(j => {
+        const col = j.tag==="event" ? "var(--event)" : staffColor(j.staff);
+        html += `<div class="ev" style="border-left-color:${col}">${escapeHtml(j.customer)}</div>`;
+      });
+      if (dj.length>4) html += `<div class="more">+${dj.length-4} more</div>`;
+      // day-off entries pinned to the bottom, styled like the ops off band
+      const offs = offFor(curMonth,d).filter(filterMatchOff);
+      if (offs.length) {
+        html += `<div class="cell-off">` + offs.map(o => `<div class="off-row"><b>🏖 ${escapeHtml(o.person)}</b>${o.note?` ${escapeHtml(o.note)}`:" off"}</div>`).join("") + `</div>`;
+      }
+      cell.innerHTML = html;
+      cell.addEventListener("click", () => selectDay(d));
+      cal.appendChild(cell);
+    }
+  }
+  function selectDay(d) {
+    selectedDay = d;
+    const wd = (FIRST_WEEKDAY_2026[curMonth]+d-1)%7;
+    const WDF = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    $("dayTitle").innerHTML = `${MONTH_NAMES[curMonth]} ${d} (${WDF[wd]}) <button class="add-btn inline" id="dayAdd">＋ Add</button>`;
+    const dj = jobsFor(curMonth,d), offs = offFor(curMonth,d);
+    let html = "";
+    offs.forEach(o => html += `<div class="job-card"><div class="cust">🏖 ${escapeHtml(o.person)} — Day off <button class="mini del" data-offdel="${o.id}">✕</button></div><div class="meta">${escapeHtml(o.note||"")}</div></div>`);
+    if (!dj.length && !offs.length) html += `<div class="empty-note">No jobs on this day.</div>`;
+    dj.forEach(j => {
+      const col = j.tag==="event" ? "var(--event)" : staffColor(j.staff);
+      html += `<div class="job-card" style="border-left-color:${col}">
+        <div class="cust">${escapeHtml(j.customer)}
+          <span class="card-actions"><button class="mini edit" data-edit="${j.id}">✎</button><button class="mini del" data-del="${j.id}">🗑</button></span>
+        </div>
+        ${(j.categories&&j.categories.length)?`<div class="meta">${j.categories.map(c=>`<span class="cat-badge">${escapeHtml(c)}</span>`).join(" ")}</div>`:""}
+        ${j.info?`<div class="meta"><span class="k">📋</span> ${escapeHtml(j.info)}</div>`:""}
+        ${j.vehicle?`<div class="meta"><span class="k">🚐</span> ${escapeHtml(j.vehicle)}</div>`:""}
+        ${j.driver?`<div class="meta"><span class="k">👤 Driver:</span> ${escapeHtml(j.driver)}</div>`:""}
+        ${j.staff?`<span class="staffbadge" style="display:inline-block;width:auto;padding:1px 8px;border-radius:10px;background:${col}">${escapeHtml(j.staff)}</span>`:""}
+      </div>`;
+    });
+    $("dayDetail").innerHTML = html;
+    const addBtn = $("dayAdd");
+    if (addBtn) addBtn.addEventListener("click", () => openJobModal(null, curMonth, d));
+    $("dayDetail").querySelectorAll("[data-edit]").forEach(el => el.addEventListener("click", () => openJobModal(jobById(el.dataset.edit))));
+    $("dayDetail").querySelectorAll("[data-del]").forEach(el => el.addEventListener("click", () => deleteJob(el.dataset.del)));
+    $("dayDetail").querySelectorAll("[data-offdel]").forEach(el => el.addEventListener("click", () => deleteOff(el.dataset.offdel)));
+  }
+
+  // ---------------- Drivers ----------------
+  function renderDrivers(filter="") {
+    const f = filter.trim().toLowerCase();
+    const list = DRIVERS.filter(d => !f || d.name.toLowerCase().includes(f) || d.group.toLowerCase().includes(f));
+    const byGroup = {}; list.forEach(d => (byGroup[d.group]=byGroup[d.group]||[]).push(d));
+    let html = "";
+    Object.keys(byGroup).forEach(g => {
+      html += `<div class="drv-group">${escapeHtml(g)}</div>`;
+      byGroup[g].forEach(d => html += `<div class="drv"><span class="nm">${escapeHtml(d.name)}</span><a href="tel:${d.phone.replace(/\s/g,"")}">${escapeHtml(d.phone)}</a></div>`);
+    });
+    if (!list.length) html = `<div class="empty-note">No matches</div>`;
+    $("drvList").innerHTML = html;
+  }
+
+  // ---------------- Search ----------------
+  function renderSearch() {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) { $("searchResultsFoot").textContent = ""; return; }
+    const hits = JOBS.filter(j => `${j.customer} ${j.info} ${j.vehicle} ${j.driver} ${j.staff}`.toLowerCase().includes(term));
+    $("searchResultsFoot").innerHTML = `“${escapeHtml(searchTerm)}” results: <b>${hits.length}</b> ` +
+      hits.slice(0,40).map(h => `<span style="display:inline-block;margin:2px 4px;padding:2px 8px;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;font-size:11.5px" data-m="${h.m}" data-d="${h.d}">${h.m}/${h.d} ${escapeHtml(h.customer)}</span>`).join("");
+    $("searchResultsFoot").querySelectorAll("[data-m]").forEach(el => el.addEventListener("click", () => {
+      const m = +el.dataset.m, d = +el.dataset.d;
+      curMonth = m;
+      weekStart = alignWeek(m, d);
+      selectedDay = d;
+      renderCurrent();
+      if (opsShowsCalendar()) selectDay(d);
+    }));
+  }
+
+  // ---------------- Range / nav ----------------
+  // ops-cards mode = range 'week' (full-month horizontal cards); 'month' = calendar
+  function opsShowsCalendar() { return range==="month"; }
+  function opsShowsCards() { return range==="week"; }
+
+  function renderLabels() {
+    $("rangeLabel").textContent = MONTH_NAMES[curMonth] + " 2026";
+  }
+
+  function applyVisibility() {
+    const calMode = (range==="month");
+    $("opsView").classList.toggle("hidden", calMode);
+    $("calendarView").classList.toggle("hidden", !calMode);
+  }
+
+  function renderCurrent() {
+    applyVisibility();
+    if (range === "week") renderOps();
+    else { renderCalendar(); if (!selectedDay || selectedDay>DAYS_IN_MONTH_2026[curMonth]) selectDay(TODAY.m===curMonth?TODAY.d:1); }
+    renderLabels();
+  }
+
+  function stepMonth(delta) {
+    let m = curMonth + delta;
+    if (m<1) m=1; if (m>12) m=12;
+    curMonth = m; weekStart = { m, d: 1 }; selectedDay = null;
+  }
+
+  $("prevBtn").addEventListener("click", () => { stepMonth(-1); renderCurrent(); });
+  $("nextBtn").addEventListener("click", () => { stepMonth(1); renderCurrent(); });
+
+  document.querySelectorAll("#rangeSeg button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("#rangeSeg button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); range = b.dataset.range;
+    renderCurrent();
+  }));
+
+  function alignWeek(m, d) {
+    const wd = weekdayOf(m,d);       // 0=Sun
+    let start = d - wd;
+    if (start < 1) start = 1;
+    return { m, d: start };
+  }
+
+  $("search").addEventListener("input", e => { searchTerm = e.target.value; renderSearch(); });
+  $("drvSearch").addEventListener("input", e => renderDrivers(e.target.value));
+
+  // ================= CRUD + MODAL =================
+  let modalMode = "job";   // 'job' | 'off'
+  let editingJobId = null;
+  let editingOffId = null;
+  let selectedCats = [];   // categories chosen in the modal
+
+  function renderCatUI() {
+    // dropdown: placeholder + unselected categories + custom option
+    const avail = CATEGORIES.filter(c => !selectedCats.includes(c));
+    $("fCatSelect").innerHTML =
+      `<option value="">＋ Add job…</option>` +
+      avail.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("") +
+      `<option value="__custom__">✎ Custom…</option>`;
+    // selected tags
+    $("fCatTags").innerHTML = selectedCats.map(c =>
+      `<span class="cat-tag">${escapeHtml(c)}<span class="x" data-rmcat="${escapeHtml(c)}">✕</span></span>`
+    ).join("");
+    $("fCatTags").querySelectorAll("[data-rmcat]").forEach(el => el.addEventListener("click", () => {
+      selectedCats = selectedCats.filter(x => x !== el.dataset.rmcat);
+      renderCatUI();
+    }));
+  }
+  function onCatSelect() {
+    const v = $("fCatSelect").value;
+    if (v === "__custom__") {
+      $("fCatCustomRow").classList.remove("hidden");
+      $("fCatSelect").value = "";
+      setTimeout(() => $("fCatNew").focus(), 30);
+      return;
+    }
+    if (v) {
+      if (!selectedCats.includes(v)) selectedCats.push(v);
+      $("fCatCustomRow").classList.add("hidden");
+      renderCatUI();
+    }
+  }
+  function addCustomCategory() {
+    const v = $("fCatNew").value.trim();
+    if (!v) return;
+    if (!CATEGORIES.some(c => c.toLowerCase()===v.toLowerCase())) { CATEGORIES.push(v); saveData(); }
+    const canon = CATEGORIES.find(c => c.toLowerCase()===v.toLowerCase());
+    if (canon && !selectedCats.includes(canon)) selectedCats.push(canon);
+    $("fCatNew").value = "";
+    $("fCatCustomRow").classList.add("hidden");
+    renderCatUI();
+  }
+
+  function fillDateSelectors(m, d) {
+    const mSel = $("fMonth"), dSel = $("fDay");
+    mSel.innerHTML = "";
+    for (let i=1;i<=12;i++) mSel.innerHTML += `<option value="${i}" ${i===m?"selected":""}>${MONTH_NAMES[i]}</option>`;
+    refreshDayOptions(m, d);
+    mSel.onchange = () => refreshDayOptions(+mSel.value, 1);
+  }
+  function refreshDayOptions(m, d) {
+    const dSel = $("fDay");
+    const n = DAYS_IN_MONTH_2026[m];
+    dSel.innerHTML = "";
+    for (let i=1;i<=n;i++) dSel.innerHTML += `<option value="${i}" ${i===d?"selected":""}>${i}</option>`;
+  }
+  function setMode(mode) {
+    modalMode = mode;
+    document.querySelectorAll("#modeSeg button").forEach(b => b.classList.toggle("active", b.dataset.mode===mode));
+    $("jobFields").classList.toggle("hidden", mode!=="job");
+    $("offFields").classList.toggle("hidden", mode!=="off");
+  }
+
+  // ---- Staff-driven UI: filter bar + modal dropdowns ----
+  function buildStaffUI() {
+    buildFilterBar();
+    // Staff dropdown
+    const cur = $("fStaff").value;
+    $("fStaff").innerHTML = `<option value="">— None —</option>` + STAFF.map(st => `<option value="${escapeHtml(st.name)}">${escapeHtml(st.name)}</option>`).join("");
+    if (cur) $("fStaff").value = cur;
+    // Person-off dropdown
+    const curOff = $("fOffPerson").value;
+    $("fOffPerson").innerHTML = STAFF.map(st => `<option value="${escapeHtml(st.name)}">${escapeHtml(st.name)}</option>`).join("");
+    if (curOff) $("fOffPerson").value = curOff;
+  }
+
+  // ---- Staff filter ----
+  let staffFilter = "all";   // 'all' | staff key
+  function buildFilterBar() {
+    if (staffFilter !== "all" && !STAFF.some(s => s.key===staffFilter)) staffFilter = "all";
+    let html = `<span class="fchip ${staffFilter==='all'?'active':''}" data-filter="all" style="${staffFilter==='all'?'background:var(--ink)':''}">All</span>`;
+    html += STAFF.map(st => `<span class="fchip ${staffFilter===st.key?'active':''}" data-filter="${st.key}" style="${staffFilter===st.key?`background:${st.color}`:''}"><span class="dot" style="background:${st.color}"></span>${escapeHtml(st.name)}</span>`).join("");
+    $("staffFilter").innerHTML = html;
+    $("staffFilter").querySelectorAll("[data-filter]").forEach(el => el.addEventListener("click", () => {
+      staffFilter = el.dataset.filter;
+      buildFilterBar();
+      renderCurrent();
+    }));
+  }
+  function filterMatchJob(j) {
+    if (staffFilter === "all") return true;
+    return staffKey(j.staff) === staffFilter;
+  }
+  function filterMatchOff(o) {
+    if (staffFilter === "all") return true;
+    const st = STAFF.find(s => s.key===staffFilter);
+    return st && (o.person||"").toLowerCase().includes(st.name.toLowerCase());
+  }
+
+  // ---- Staff manager ----
+  function staffUsedCount(st) {
+    let n = JOBS.filter(j => staffKey(j.staff)===st.key).length;
+    n += STAFF_OFF.filter(o => (o.person||"").toLowerCase()===st.name.toLowerCase() || (o.person||"").toLowerCase()===st.key.toLowerCase()).length;
+    return n;
+  }
+  function renderStaffManager() {
+    $("staffList").innerHTML = STAFF.map(st => {
+      const used = staffUsedCount(st);
+      return `<div class="staff-row" data-key="${st.key}">
+        <div class="swrap">
+          <input type="color" value="${st.color}" data-color="${st.key}">
+          <span class="sname">${escapeHtml(st.name)}</span>
+        </div>
+        <input class="staff-email" type="email" placeholder="google email (for calendar)" value="${escapeHtml(st.email||'')}" data-email="${st.key}">
+        <span class="used">${used}</span>
+        <button class="rm" data-rm="${st.key}" ${used>0?"disabled title='Has assigned entries, cannot delete'":""}>Delete</button>
+      </div>`;
+    }).join("");
+    $("staffList").querySelectorAll("[data-color]").forEach(el => el.addEventListener("input", () => {
+      const st = STAFF.find(s => s.key===el.dataset.color); if (st) { st.color = el.value; saveData(); buildStaffUI(); renderCurrent(); }
+    }));
+    $("staffList").querySelectorAll("[data-email]").forEach(el => el.addEventListener("change", () => {
+      const st = STAFF.find(s => s.key===el.dataset.email); if (st) { st.email = el.value.trim(); saveData(); }
+    }));
+    $("staffList").querySelectorAll("[data-rm]").forEach(el => el.addEventListener("click", async () => {
+      const st = STAFF.find(s => s.key===el.dataset.rm); if (!st) return;
+      if (staffUsedCount(st) > 0) return;
+      if (!await uiConfirm(`Delete staff member "${st.name}"?`)) return;
+      STAFF = STAFF.filter(s => s.key !== st.key);
+      saveData(); renderStaffManager(); buildStaffUI(); renderCurrent();
+    }));
+  }
+  function addStaff() {
+    const name = $("newStaffName").value.trim();
+    if (!name) { uiAlert("Please enter a staff name."); return; }
+    const key = name.toLowerCase();
+    if (STAFF.some(s => s.key===key)) { uiAlert("That staff member already exists."); return; }
+    STAFF.push({ key, name, color: $("newStaffColor").value, email: ($("newStaffEmail").value||"").trim() });
+    $("newStaffName").value = "";
+    $("newStaffEmail").value = "";
+    $("newStaffColor").value = STAFF_PALETTE[STAFF.length % STAFF_PALETTE.length];
+    saveData(); renderStaffManager(); buildStaffUI(); renderCurrent();
+  }
+
+  function openJobModal(job, m, d) {
+    editingJobId = job ? job.id : null;
+    editingOffId = null;
+    setMode("job");
+    buildStaffUI();
+    $("modeSeg").style.display = job ? "none" : "";      // hide mode toggle when editing
+    $("modalTitle").textContent = job ? "Edit Job" : "New Entry";
+    fillDateSelectors(job ? job.m : (m||curMonth), job ? job.d : (d||1));
+    $("fCustomer").value = job ? (job.customer||"") : "";
+    $("fInfo").value = job ? (job.info||"") : "";
+    $("fVehicle").value = job ? (job.vehicle||"") : "";
+    $("fDriver").value = job ? (job.driver||"") : "";
+    $("fStaff").value = job ? (job.staff||"") : "";
+    $("fEvent").checked = job ? job.tag==="event" : false;
+    $("fNotes").value = job ? (job.notes||"") : "";
+    selectedCats = job && Array.isArray(job.categories) ? job.categories.slice() : [];
+    $("fCatNew").value = "";
+    $("fCatCustomRow").classList.add("hidden");
+    renderCatUI();
+    showModal();
+    setTimeout(()=>$("fCustomer").focus(), 50);
+  }
+  function openOffModal(off, m, d) {
+    editingOffId = off ? off.id : null;
+    editingJobId = null;
+    setMode("off");
+    buildStaffUI();
+    $("modeSeg").style.display = off ? "none" : "";
+    $("modalTitle").textContent = off ? "Edit Day Off" : "Add Day Off";
+    fillDateSelectors(off ? off.m : (m||curMonth), off ? off.d : (d||1));
+    $("fOffPerson").value = off ? (off.person||STAFF[0].name) : STAFF[0].name;
+    $("fOffNote").value = off ? (off.note||"") : "";
+    showModal();
+  }
+  function showModal() { $("modalOverlay").classList.remove("hidden"); }
+  function hideModal() { $("modalOverlay").classList.add("hidden"); }
+
+  function saveModal() {
+    const m = +$("fMonth").value, d = +$("fDay").value;
+    if (modalMode === "job") {
+      const customer = $("fCustomer").value.trim();
+      if (!customer) { uiAlert("Please enter a customer / group name."); $("fCustomer").focus(); return; }
+      const data = {
+        m, d, customer,
+        info: $("fInfo").value.trim(),
+        vehicle: $("fVehicle").value.trim(),
+        driver: $("fDriver").value.trim(),
+        staff: $("fStaff").value,
+        categories: selectedCats.slice(),
+        notes: $("fNotes").value.trim(),
+        tag: $("fEvent").checked ? "event" : undefined,
+      };
+      if (editingJobId) {
+        const j = jobById(editingJobId);
+        Object.assign(j, data);
+      } else {
+        JOBS.push({ id: newId(), ...data });
+      }
+    } else {
+      const data = { m, d, person: $("fOffPerson").value, note: $("fOffNote").value.trim() };
+      if (editingOffId) { Object.assign(offById(editingOffId), data); }
+      else { STAFF_OFF.push({ id: newId(), ...data }); }
+    }
+    saveData();
+    hideModal();
+    curMonth = m;
+    renderCurrent();
+    if (opsShowsCalendar()) selectDay(d);
+  }
+
+  async function deleteJob(id) {
+    const j = jobById(id); if (!j) return;
+    if (!await uiConfirm(`Delete job "${j.customer}"?`)) return;
+    JOBS = JOBS.filter(x => x.id !== id);
+    saveData(); renderCurrent();
+    if (opsShowsCalendar() && selectedDay) selectDay(selectedDay);
+  }
+  async function deleteOff(id) {
+    const o = offById(id); if (!o) return;
+    if (!await uiConfirm(`Delete ${o.person}'s day off?`)) return;
+    STAFF_OFF = STAFF_OFF.filter(x => x.id !== id);
+    saveData(); renderCurrent();
+    if (opsShowsCalendar() && selectedDay) selectDay(selectedDay);
+  }
+
+  // modal wiring
+  document.querySelectorAll("#modeSeg button").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  $("modalCancel").addEventListener("click", hideModal);
+  $("modalCancel2").addEventListener("click", hideModal);
+  $("modalSave").addEventListener("click", saveModal);
+  $("fCatSelect").addEventListener("change", onCatSelect);
+  $("fCatAdd").addEventListener("click", addCustomCategory);
+  $("fCatNew").addEventListener("keydown", e => { if (e.key==="Enter") { e.preventDefault(); addCustomCategory(); } });
+  $("modalOverlay").addEventListener("click", e => { if (e.target.id==="modalOverlay") hideModal(); });
+  document.addEventListener("keydown", e => { if (e.key==="Escape") { hideModal(); closeDetail(); closeDrivers(); } });
+  $("topAdd").addEventListener("click", () => openJobModal(null, curMonth, (TODAY.m===curMonth?TODAY.d:1)));
+  $("btnExport").addEventListener("click", exportData);
+
+  // staff manager wiring
+  function openStaffMgr() { renderStaffManager(); $("newStaffColor").value = STAFF_PALETTE[STAFF.length % STAFF_PALETTE.length]; $("staffOverlay").classList.remove("hidden"); }
+  function closeStaffMgr() { $("staffOverlay").classList.add("hidden"); }
+  $("btnStaff").addEventListener("click", openStaffMgr);
+  $("staffX").addEventListener("click", closeStaffMgr);
+  $("staffDone").addEventListener("click", closeStaffMgr);
+  $("staffOverlay").addEventListener("click", e => { if (e.target.id==="staffOverlay") closeStaffMgr(); });
+  $("newStaffAdd").addEventListener("click", addStaff);
+  $("newStaffName").addEventListener("keydown", e => { if (e.key==="Enter") addStaff(); });
+
+  // drivers modal wiring
+  function openDrivers() { renderDrivers($("drvSearch").value||""); $("driversOverlay").classList.remove("hidden"); }
+  function closeDrivers() { $("driversOverlay").classList.add("hidden"); }
+  $("btnDrivers").addEventListener("click", openDrivers);
+  $("driversX").addEventListener("click", closeDrivers);
+  $("driversDone").addEventListener("click", closeDrivers);
+  $("driversOverlay").addEventListener("click", e => { if (e.target.id==="driversOverlay") closeDrivers(); });
+
+  // init
+  weekStart = alignWeek(TODAY.m, TODAY.d);
+  curMonth = TODAY.m;
+  setSyncStatus(fbDoc ? "saving" : "local");
+  (async () => {
+    await loadData();
+    buildStaffUI();
+    renderDrivers();
+    renderCurrent();
+    subscribeRealtime();
+    setSyncStatus(fbReady ? "saved" : "local");
+  })();
+</script>
+</body>
+</html>
