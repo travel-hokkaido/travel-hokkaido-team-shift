@@ -321,19 +321,18 @@
   /* ---- Staff manager ---- */
   #staffList { display: flex; flex-direction: column; gap: 8px; }
   .staff-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: 6px; background: #fffefb; }
-  .staff-row .swrap { display: flex; align-items: center; gap: 8px; flex: 1; }
-  .staff-row input[type=color] { width: 30px; height: 26px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; background: none; }
+  .staff-row .swrap { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+  .staff-row input[type=color] { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; background: none; flex: none; }
   .staff-row .sname { font-weight: 700; font-size: 14px; }
-  .staff-row .used { font-size: 11px; color: var(--muted); }
-  .staff-email { flex: 1; min-width: 120px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 5px; font-size: 12.5px; }
+  .staff-row .used { font-size: 11px; color: var(--muted); flex: none; }
+  .staff-email { flex: 1; min-width: 80px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 5px; font-size: 12.5px; }
   .staff-email:focus { outline: none; border-color: var(--accent); }
-  .staff-add-row input[type=email] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; }
-  .staff-row .rm { border: 1px solid var(--line); background: #fff; border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer; color: var(--accent); }
-  .staff-row .rm:disabled { color: #c3bba9; cursor: not-allowed; border-color: var(--line-soft); }
-  .staff-row .rm:not(:disabled):hover { background: #f8d7d0; border-color: var(--accent); }
-  .staff-add-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
-  .staff-add-row input[type=text] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; }
-  .staff-add-row input[type=color] { width: 40px; height: 38px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; }
+  .staff-row .rm { border: 1px solid var(--line); background: #fff; border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer; color: var(--accent); flex: none; }
+  .staff-row .rm:hover { background: #f8d7d0; border-color: var(--accent); }
+  .staff-add-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+  .staff-add-row input[type=text], .staff-add-row input[type=email] { flex: 1 1 120px; min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; }
+  .staff-add-row input[type=color] { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 5px; padding: 0; cursor: pointer; flex: none; }
+  .staff-add-row .btn { flex: none; white-space: nowrap; }
   .staff-note { font-size: 11.5px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
 
   /* ---- Detail modal ---- */
@@ -511,7 +510,7 @@
         <input id="newStaffColor" type="color" value="#16a085" title="Color">
         <button class="btn primary" id="newStaffAdd">＋ Add</button>
       </div>
-      <p class="staff-note">Add each staff member's Google email to auto-add their jobs to their Google Calendar (they get an invite). Calendar sync must be configured in config.js. Staff with assigned entries can't be deleted.</p>
+      <p class="staff-note">Add each staff member's Google email to auto-add their jobs to their Google Calendar (they get an invite). Calendar sync must be configured in config.js.</p>
     </div>
     <div class="modal-foot">
       <button class="btn primary" id="staffDone">Done</button>
@@ -1134,8 +1133,8 @@
           <span class="sname">${escapeHtml(st.name)}</span>
         </div>
         <input class="staff-email" type="email" placeholder="google email (for calendar)" value="${escapeHtml(st.email||'')}" data-email="${st.key}">
-        <span class="used">${used}</span>
-        <button class="rm" data-rm="${st.key}" ${used>0?"disabled title='Has assigned entries, cannot delete'":""}>Delete</button>
+        <span class="used" title="assigned jobs">${used}</span>
+        <button class="rm" data-rm="${st.key}">Delete</button>
       </div>`;
     }).join("");
     $("staffList").querySelectorAll("[data-color]").forEach(el => el.addEventListener("input", () => {
@@ -1146,8 +1145,11 @@
     }));
     $("staffList").querySelectorAll("[data-rm]").forEach(el => el.addEventListener("click", async () => {
       const st = STAFF.find(s => s.key===el.dataset.rm); if (!st) return;
-      if (staffUsedCount(st) > 0) return;
-      if (!await uiConfirm(`Delete staff member "${st.name}"?`)) return;
+      const used = staffUsedCount(st);
+      const msg = used > 0
+        ? `"${st.name}" has ${used} assigned job(s). Delete this staff member anyway? (The jobs stay, but lose their color.)`
+        : `Delete staff member "${st.name}"?`;
+      if (!await uiConfirm(msg)) return;
       STAFF = STAFF.filter(s => s.key !== st.key);
       saveData(); renderStaffManager(); buildStaffUI(); renderCurrent();
     }));
