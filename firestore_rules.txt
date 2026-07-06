@@ -1,0 +1,22 @@
+// ============================================================
+//  Firestore 보안 규칙 (링크만 있으면 누구나 보기/편집)
+//  Firebase 콘솔 → Firestore Database → Rules 에 붙여넣고 [Publish]
+//
+//  주의: 이 규칙은 "dashboards/main" 문서 하나만 공개 읽기/쓰기 허용.
+//  링크를 아는 사람만 편집하도록, 링크를 팀 내부에만 공유하세요.
+// ============================================================
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 이 앱이 쓰는 공유 문서만 공개 허용
+    match /dashboards/main {
+      allow read, write: if true;
+    }
+
+    // 그 외 모든 문서는 기본 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
