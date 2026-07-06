@@ -532,7 +532,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-  const TODAY = { m: 7, d: 3, y: 2026 };
+  const _now = new Date();
+  const TODAY = { m: _now.getMonth() + 1, d: _now.getDate(), y: _now.getFullYear() };
 
   // ---------------- Persistence (Firebase Firestore shared doc + localStorage fallback) ----------------
   const STORE_KEY = "thk_shifts_v1";
@@ -715,7 +716,8 @@
   const offFor = (m,d) => STAFF_OFF.filter(o => o.m===m && o.d===d);
   const weekdayOf = (m,d) => (FIRST_WEEKDAY_2026[m] + d - 1) % 7;
 
-  $("todayStr").textContent = "2026.07.03 (Fri)";
+  $("todayStr").textContent =
+    `${TODAY.y}.${String(TODAY.m).padStart(2,"0")}.${String(TODAY.d).padStart(2,"0")} (${WD[_now.getDay()]})`;
 
   // ---------------- OPS GRID (original sheet layout) ----------------
   function renderOps() {
